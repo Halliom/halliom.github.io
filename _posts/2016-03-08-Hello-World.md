@@ -1,10 +1,9 @@
 ---
 layout: post
 title: Hello World
-author: Author Name
+author: Halliom
 ---
 
 ## Hello World
 -----
-
-Test
+Hello here I am testing this Jekyll thing out. I am currently just testing this theme and I guess I should update it later but for now it will do.
