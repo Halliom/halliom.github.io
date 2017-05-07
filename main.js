@@ -4,7 +4,7 @@ var colors = ["red", "cyan", "green", "grey", "white"];
 
 var animationSpeed = 1;
 
-var previousTimeStamp = null;
+var previousTimeStamp = 0;
 
 var currentAnimation;
 var currentAnimationX;
@@ -26,15 +26,14 @@ function animation(timestamp) {
         currentAnimationY = Math.floor(Math.random() * columns);
     } else if (currentAnimation >= 180) {
         // Do nothing, just wait
+    } else if (currentAnimation == 90) {
+        pads[currentAnimationX][currentAnimationY].style.backgroundColor = getRandomColor();
     } else {
-        pads[currentAnimationX][currentAnimationY].style.transform = "rotateY(" + 45 + "deg)";
+        pads[currentAnimationX][currentAnimationY].style.transform = "rotateY(" + currentAnimation + "deg)";
     }
 
-    if (!previousTimeStamp) {
-        previousTimeStamp = timestamp;
-    }
-    var delta = Number(timestamp - previousTimeStamp);
-    currentAnimation = currentAnimation + animationSpeed * delta;
+    var delta = timestamp - previousTimeStamp;
+    currentAnimation += animationSpeed;
 
     console.log(currentAnimation);
     previousTimeStamp = timestamp;
