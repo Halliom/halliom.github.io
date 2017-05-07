@@ -4,6 +4,15 @@ body {
     padding: 0;
 }
 
+@keyframes flip {
+    from {
+        transform: rotateY( 0deg );
+    }
+    to {
+        transform: rotateY( 180deg );
+    }
+}
+
 @keyframes slide-in {
     from {
         left: -100%;
@@ -18,6 +27,14 @@ body {
     width: 100%;
     height: 100%;
     display: table;
+}
+
+.pad {
+}
+
+.pad-animate {
+    animation-name: flip;
+    animation-duration: 1s;
 }
 
 #foreground {
