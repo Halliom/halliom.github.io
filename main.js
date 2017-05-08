@@ -6,9 +6,7 @@ var animationSpeed = 0.35;
 
 var previousTimeStamp = 0;
 
-var currentAnimation;
-var currentAnimationX;
-var currentAnimationY;
+var animations = new Array();
 
 var pads = new Array(rows);
 for (var i = 0; i < rows; i++) {
@@ -19,26 +17,53 @@ function getRandomColor() {
     return colors[Math.floor(Math.random() * colors.length)];
 }
 
-function animation(timestamp) {
-    if (currentAnimation >= 720) {
-        currentAnimation = 0;
-        currentAnimationX = Math.floor(Math.random() * rows);
-        currentAnimationY = Math.floor(Math.random() * columns);
-    } else if (currentAnimation >= 180) {
-        // Do nothing, just wait
-    } else if (currentAnimation == 90) {
-        pads[currentAnimationX][currentAnimationY].style.backgroundColor = getRandomColor();
-    } else {
-        pads[currentAnimationX][currentAnimationY].style.transform = "rotateY(" + currentAnimation + "deg)";
-    }
+function Animation(x, y, newColor, onDone) {
+    this.x = x;
+    this.y = y;
+    this.newColor = newColor;
+    this.onDone = onDone;
+    this.progress = 0;
+}
 
+function addAnimation() {
+    var anim = new Animation(Math.floor(Math.random() * rows), 
+                             Math.floor(Math.random() * columns), 
+                             getRandomColor(),
+                             function() {
+                                 setTimeout(function() { addAnimation(); }, 2000);
+                             });
+    animations.push(anim);
+}
+
+function updateAnimations(timestamp) {
     var delta = timestamp - previousTimeStamp;
-    var deltaAnimation = parseInt(delta * animationSpeed);
-    
-    currentAnimation += delta * animationSpeed;
+    var deltaAnimation = delta * animationSpeed;
 
+    for (var i = 0; i < animations.length; i++) {
+        var animation = animations[i];
+
+        if (animation.progress >= 180) {
+            // Animation done, reset the rotation
+            pads[animation.x][animation.y].style.transform = "rotateY(0deg)";
+
+            // Remove the animation from the list
+            animations.splice(i, 1);
+            animation.onDone();
+        } else if (Math.round(animation.progress) == 90) {
+            pads[animation.x][animation.y].style.backgroundColor = animation.newColor;
+        } else {
+            pads[animation.x][animation.y].style.transform = "rotateY(" + animation.progress + "deg)";
+        }
+        
+        animation.progress += deltaAnimation;
+    }
+    
     previousTimeStamp = timestamp;
-    requestAnimationFrame(animation);
+    requestAnimationFrame(updateAnimations);
+}
+
+function clickHandler(event) {
+    console.log(event.currentTarget);
 }
 
 var background = document.getElementById("background");
@@ -56,6 +81,7 @@ for (var i = 0; i < rows; i++) {
         childNode.style.height = (100 / rows) + "%";
         childNode.style.backgroundColor = getRandomColor();
         childNode.style.display = "table-cell";
+        childNode.addEventListener("click", clickHandler);
 
         pads[i][j] = childNode;
         row.appendChild(childNode);
@@ -63,9 +89,7 @@ for (var i = 0; i < rows; i++) {
     background.appendChild(row);
 }
 
-currentAnimation = 0;
-currentAnimationX = Math.floor(Math.random() * rows);
-currentAnimationY = Math.floor(Math.random() * columns);
+addAnimation();
 setTimeout(function() {
-    animation(previousTimeStamp);
+    updateAnimations(previousTimeStamp);
 }, 2000);
