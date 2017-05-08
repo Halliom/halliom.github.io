@@ -63,7 +63,10 @@ function updateAnimations(timestamp) {
 }
 
 function clickHandler(event) {
-    console.log(event.currentTarget);
+    var i = event.currentTarget.getAttribute("row");
+    var j = event.currentTarget.getAttribute("col");
+
+    animations.push(new Animation(i, j, getRandomColor(), function() {}));
 }
 
 var background = document.getElementById("background");
@@ -81,7 +84,10 @@ for (var i = 0; i < rows; i++) {
         childNode.style.height = (100 / rows) + "%";
         childNode.style.backgroundColor = getRandomColor();
         childNode.style.display = "table-cell";
+        
         childNode.addEventListener("click", clickHandler);
+        childNode.setAttribute("row", i);
+        childNode.setAttribute("col", j);
 
         pads[i][j] = childNode;
         row.appendChild(childNode);
