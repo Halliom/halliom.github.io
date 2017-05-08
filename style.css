@@ -34,7 +34,24 @@ body {
     }
 }
 
-#modal {
+@keyframes slide-up {
+    from {
+        top: 0;
+    }
+    to {
+        top: -120%;
+    }
+}
+
+.slide-down-animate {
+    animation: slide-down 1s;
+}
+
+.slide-up-animate {
+    animation: slide-up 1s;
+}
+
+.modal {
     position: fixed;
     left: 0;
     top: -120%;

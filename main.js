@@ -133,12 +133,17 @@ function updateAnimations(timestamp) {
     requestAnimationFrame(updateAnimations);
 }
 
-function clickHandler(event) {
+function padClickHandler(event) {
     var i = event.currentTarget.getAttribute("row");
     var j = event.currentTarget.getAttribute("col");
     var previousColor = event.currentTarget.style.backgroundColor;
 
     animations.push(new Animation(i, j, getRandomColorNot(previousColor), function() {}));
+}
+
+function toggleModalClickHandler(event) {
+    document.getElementsByClassName("modal")[0].classList.add("slide-down-animate");
+    document.getElementsByClassName("modal")[0].style.top = "0";
 }
 
 function giveColorTo(i, j) {
@@ -171,7 +176,7 @@ for (var i = 0; i < rows; i++) {
         childNode.style.backgroundColor = "rgb(255, 255, 255)";
         childNode.style.display = "table-cell";
             
-        childNode.addEventListener("click", clickHandler);
+        childNode.addEventListener("click", padClickHandler);
         childNode.setAttribute("row", i);
         childNode.setAttribute("col", j);
 
@@ -181,6 +186,7 @@ for (var i = 0; i < rows; i++) {
     }
     background.appendChild(row);
 }
+document.getElementById("modal-toggle").addEventListener("click", toggleModalClickHandler);
 
 giveColorTo(0, 0);
 
