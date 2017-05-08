@@ -9,7 +9,7 @@ body {
         left: -100%;
     }
     to {
-        left: 50%;
+        left: 0;
     }
 }
 
@@ -20,29 +20,14 @@ body {
     display: table;
 }
 
-.pad {
-}
-
 .pad-animate {
     animation-name: flip;
     animation-duration: 1s;
 }
 
-#foreground {
-    position: absolute;
-    top: 30%;
-    left: 50%;
-    margin-left: -25%;
-
-    animation: slide-in 2s ease-in-out;
-}
-
 #image {
     width: 132px;
     height: 132px;
-
-    float: left;
-    top: 16px;
 
     border-radius: 50%;
     border-style: solid;
@@ -50,11 +35,75 @@ body {
     border-color: #D3D3D3;
 }
 
-#text {
-    text-align: left;
+.white {
+    color: white;
+}
 
-    padding-top: 16px;
-    margin-left: 164px;
+.black {
+    color: black;
+}
+
+@media screen and (min-width: 700px) {
+    #foreground {
+        pointer-events: none;
+        position: absolute;
+        height: 100%;
+        width: 700px;
+        margin: 0 auto;
+        left: 0;
+        right: 0;
+
+        animation: slide-in 2s ease-in-out;
+    }
+    
+    #image {
+        pointer-events: all;
+        float: left;
+        top: 16px;
+    }
+
+    #text {
+        text-align: left;
+
+        padding-top: 16px;
+        margin-left: 164px;
+    }
+
+    #profile {
+        margin-top: 25%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    #buttons {
+        position: absolute;
+        width: 100%;
+        bottom: 10%;
+
+        font-size: 48px;
+        text-align: center;
+    }
+
+    .button {
+        pointer-events: all;
+        padding-left: 20px;
+        padding-right: 20px;
+
+        text-decoration: none;
+    }
+}
+
+@media screen and (max-width: 700px) {
+    #foreground {
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        margin: 0 auto;
+        left: 0;
+        right: 0;
+
+        /* animation: slide-in 2s ease-in-out; */
+    }
 }
 
 #name {
