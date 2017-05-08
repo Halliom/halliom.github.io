@@ -1,8 +1,8 @@
-var rows = 12;
-var columns = 18;
+var rows = 10;
+var columns = 14;
 var colors = ["red", "cyan", "green", "grey", "white"];
 
-var animationSpeed = 1;
+var animationSpeed = 0.35;
 
 var previousTimeStamp = 0;
 
@@ -20,7 +20,7 @@ function getRandomColor() {
 }
 
 function animation(timestamp) {
-    if (currentAnimation >= 360) {
+    if (currentAnimation >= 720) {
         currentAnimation = 0;
         currentAnimationX = Math.floor(Math.random() * rows);
         currentAnimationY = Math.floor(Math.random() * columns);
@@ -33,9 +33,10 @@ function animation(timestamp) {
     }
 
     var delta = timestamp - previousTimeStamp;
-    currentAnimation += animationSpeed;
+    var deltaAnimation = parseInt(delta * animationSpeed);
+    
+    currentAnimation += delta * animationSpeed;
 
-    console.log(currentAnimation);
     previousTimeStamp = timestamp;
     requestAnimationFrame(animation);
 }
@@ -65,4 +66,6 @@ for (var i = 0; i < rows; i++) {
 currentAnimation = 0;
 currentAnimationX = Math.floor(Math.random() * rows);
 currentAnimationY = Math.floor(Math.random() * columns);
-setTimeout(animation, 2000);
+setTimeout(function() {
+    animation(previousTimeStamp);
+}, 2000);
