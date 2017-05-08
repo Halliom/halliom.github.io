@@ -43,6 +43,44 @@ body {
     color: black;
 }
 
+#buttons {
+    position: absolute;
+    width: 100%;
+    bottom: 10%;
+
+    font-size: 48px;
+    text-align: center;
+}
+
+.button {
+    pointer-events: all;
+    padding-left: 20px;
+    padding-right: 20px;
+
+    text-decoration: none;
+}
+
+.fa-twitter-square:hover {
+    line-height: 0.65em;
+    border-radius: 50%;
+    background-color: white;
+    color: #4099FF;
+}
+
+.fa-linkedin-square:hover {
+    line-height: 0.65em;
+    border-radius: 50%;
+    background-color: white;
+    color: #007bb5;
+}
+
+.fa-github-square:hover {
+    line-height: 0.65em;
+    border-radius: 50%;
+    background-color: white;
+    color: black;
+}
+
 @media screen and (min-width: 700px) {
     #foreground {
         pointer-events: none;
@@ -73,23 +111,6 @@ body {
         margin-top: 25%;
         margin-left: auto;
         margin-right: auto;
-    }
-
-    #buttons {
-        position: absolute;
-        width: 100%;
-        bottom: 10%;
-
-        font-size: 48px;
-        text-align: center;
-    }
-
-    .button {
-        pointer-events: all;
-        padding-left: 20px;
-        padding-right: 20px;
-
-        text-decoration: none;
     }
 }
 
