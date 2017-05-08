@@ -3,10 +3,10 @@ var rows = 10;
 var columns = 14;
 
 // Adapted from http://stackoverflow.com/questions/2353211/hsl-to-rgb-color-conversion
-function toRGB(h, s, l){
+function toRGB(h, s, b){
     var r, g, b;
     if (s == 0) {
-        r = g = b = l; // achromatic
+        r = g = b = b; // achromatic
     } else {
         var hue2rgb = function hue2rgb(p, q, t) {
             if (t < 0) t += 1;
@@ -17,8 +17,8 @@ function toRGB(h, s, l){
             return p;
         }
 
-        var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-        var p = 2 * l - q;
+        var q = b < 0.5 ? b * (1 + s) : b + s - b * s;
+        var p = 2 * b - q;
         r = hue2rgb(p, q, h + 1/3);
         g = hue2rgb(p, q, h);
         b = hue2rgb(p, q, h - 1/3);
@@ -31,29 +31,31 @@ function toRGB(h, s, l){
 // Generate the color palette
 var colors = new Array();
 var saturation = 0.25 + Math.random() * 0.5;
-var luminance = 0.25 + Math.random() * 0.5;
+var brightness = 0.25 + Math.random() * 0.5;
 
 var baseOffset = Math.random() * 360;
-var offset1 = -15;
-var offset2 = 120;
+var offset1 = 180;
 
 var range1 = 30;
 var range2 = 30;
-var range3 = 60;
 for (var i = 0; i < 10; i++) {
-    var randAngle = Math.random() * (range1 + range2 + range3);
+    var randAngle = Math.random() * (range1 + range2);
     if (randAngle > range1) { // It is not in the first range
-        if (randAngle < (range1 + range2)) { // It is in the second range
-            randAngle += offset1;
-        } else { // It is in the third range
-            randAngle += offset2;
-        }
+        randAngle += offset1;
     }
 
-    var hue = ((baseOffset + randAngle) / 360) % 1.0;
-    colors.push(toRGB(hue, saturation, luminance));
+    var hue = ((baseOffset + randAngle) % 360) / 360;
+    colors.push(toRGB(hue, saturation, brightness));
 }
-console.log(colors);
+
+// Set the theme
+var theme = brightness < 0.5 ? "white" : "black";
+document.getElementById("text").classList.add(theme);
+var buttons = document.getElementsByClassName("button");
+for (var i = 0; i < buttons.length; i++) {
+    buttons[i].classList.add(theme);
+}
+
 
 // Speed of the animation
 var animationSpeed = 0.35;
@@ -139,6 +141,21 @@ function clickHandler(event) {
     animations.push(new Animation(i, j, getRandomColorNot(previousColor), function() {}));
 }
 
+function giveColorTo(i, j) {
+    if (pads[i][j].style.backgroundColor == "rgb(255, 255, 255)") {
+        pads[i][j].style.backgroundColor = getRandomColor();
+
+        setTimeout(function() {
+            if (i + 1 < rows) {
+                giveColorTo(i + 1, j);
+            }
+            if (j + 1 < columns) {
+                giveColorTo(i, j + 1);
+            }
+        }, 64);
+    }
+}
+
 var background = document.getElementById("background");
 for (var i = 0; i < rows; i++) {
     // Create a row element to contain the cells/pads in that row
@@ -147,23 +164,25 @@ for (var i = 0; i < rows; i++) {
     row.style.height = (100 / rows) + "%";
     row.style.display = "table-row";
     for (var j = 0; j < columns; j++) {
-        // Create the table cells (the pads)
         var childNode = document.createElement("div");
         childNode.className = "pad";
         childNode.style.width = (100 / columns) + "%";
         childNode.style.height = (100 / rows) + "%";
-        childNode.style.backgroundColor = getRandomColor();
+        childNode.style.backgroundColor = "rgb(255, 255, 255)";
         childNode.style.display = "table-cell";
-        
+            
         childNode.addEventListener("click", clickHandler);
         childNode.setAttribute("row", i);
         childNode.setAttribute("col", j);
 
         pads[i][j] = childNode;
         row.appendChild(childNode);
+
     }
     background.appendChild(row);
 }
+
+giveColorTo(0, 0);
 
 addAnimation();
 setTimeout(function() {
