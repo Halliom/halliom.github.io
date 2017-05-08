@@ -67,7 +67,17 @@ body {
     margin-right: 20%;
     
     margin-top: 10%;
-    height: 90%;
+    height: 80%;
+}
+
+#modal-footer {
+    width: 100%;
+    z-index: 0;
+
+    text-align: center;
+    text-shadow: 1px 1px 5px #101010;
+    font-size: 2em;
+    color: #303030;
 }
 
 #modal-toggle {  
@@ -78,6 +88,11 @@ body {
 }
 
 .fa-angle-down {
+    pointer-events: all;
+    cursor: pointer;
+}
+
+.fa-angle-up {
     pointer-events: all;
     cursor: pointer;
 }
