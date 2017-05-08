@@ -53,14 +53,16 @@ body {
     height: 90%;
 }
 
-#modal-toggle {
-    pointer-events: all;
-    cursor: pointer;
-    
+#modal-toggle {  
     text-align: center;
     text-shadow: 1px 1px 5px #101010;
     font-size: 2em;
     color: #303030;
+}
+
+.fa-angle-down {
+    pointer-events: all;
+    cursor: pointer;
 }
 
 #image {
