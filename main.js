@@ -1,6 +1,19 @@
 var rows = 10;
 var columns = 14;
-var colors = ["red", "cyan", "green", "grey", "white"];
+
+// Generate the color palette
+var colors = new Array(10);
+//colors.push("#F8F8FF");
+//colors.push("#F5F5F5");
+var baseR = parseInt(Math.floor(Math.random() * 256));
+var baseG = parseInt(Math.floor(Math.random() * 256));
+var baseB = parseInt(Math.floor(Math.random() * 256));
+for (var i = 0; i < 10; i++) {
+    var baseR = (baseR + (Math.floor(Math.random() * 72))) % 256;
+    var baseG = (baseG + (Math.floor(Math.random() * 72))) % 256;
+    var baseB = (baseB + (Math.floor(Math.random() * 72))) % 256;
+    colors.push("#" + baseR.toString(16) + baseG.toString(16) + baseB.toString(16));
+}
 
 var animationSpeed = 0.35;
 
