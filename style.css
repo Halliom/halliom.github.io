@@ -25,6 +25,100 @@ body {
     animation-duration: 1s;
 }
 
+@keyframes slide-down {
+    from {
+        top: -120%;
+    }
+    to {
+        top: 0;
+    }
+}
+
+@keyframes slide-up {
+    from {
+        top: 0;
+    }
+    to {
+        top: -120%;
+    }
+}
+
+.slide-down-animate {
+    animation: slide-down 1s;
+}
+
+.slide-up-animate {
+    animation: slide-up 1s;
+}
+
+.modal {
+    position: fixed;
+    left: 0;
+    top: -120%;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    background-color: rgb(55, 55, 55);
+    opacity: 0.8;
+}
+
+#modal-body {
+    margin-left: 20%;
+    margin-right: 20%;
+    
+    margin-top: 10%;
+    height: 80%;
+}
+
+#contact-details {
+    margin-left: auto;
+    margin-right: auto;
+    color: white;
+
+    font-size: 28px;
+    width: 100%;
+}
+
+#contact-details > div {
+    margin-top: 10px;
+    width: 100%;
+}
+
+#contact-details > div > a {
+    float: right;
+}
+
+a {
+    text-decoration: none;
+    color: white;
+}
+
+#modal-footer {
+    width: 100%;
+    z-index: 0;
+
+    text-align: center;
+    text-shadow: 1px 1px 5px #101010;
+    font-size: 2em;
+}
+
+#modal-toggle {  
+    text-align: center;
+    text-shadow: 1px 1px 5px #101010;
+    font-size: 2em;
+    color: #303030;
+}
+
+.fa-angle-down {
+    pointer-events: all;
+    cursor: pointer;
+}
+
+.fa-angle-up {
+    pointer-events: all;
+    cursor: pointer;
+}
+
 #image {
     width: 132px;
     height: 132px;
