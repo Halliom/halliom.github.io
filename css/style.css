@@ -2,3 +2,33 @@ body {
     margin: 0;
     padding: 0;
 }
+
+.site-wrapper {
+    padding-left: 5%; 
+    padding-right: 5%; 
+}
+
+.blog-header {
+    margin-top: 20px;
+
+    padding: 10px;
+
+    font-family: 'Raleway', sans-serif;
+    font-size: 2rem;
+}
+
+.blog-left-title {
+    font-weight: 800;
+    color: #161616;
+}
+
+.blog-right-title {
+    font-weight: 700;
+    color: #2f2f2f;
+}
+
+.page-content {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 400;
+}
