@@ -142,7 +142,11 @@ body {
     }
 
     .post-title-small {
-        padding-left: 0.33rem;
+        padding-left: 10px;
+        padding-right: 30px;
+
+        width: fit-content;
+
 
         padding-bottom: 0.33rem;
         border-bottom-style: solid;
@@ -151,6 +155,6 @@ body {
     }
 
     .post-body-small {
-        padding-left: 0.5rem;
+        padding-left: 10px;
     }
 }
