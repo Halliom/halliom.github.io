@@ -187,8 +187,21 @@ body {
     }
 
     .page-content {
+        position: relative;
+
         padding-left: 10px;
         padding-right: 10px;
+
+        width: auto;
+        height: 100%;
+    }
+
+    .sidebar {
+        float: right;
+        overflow: hidden;
+
+        width: 200px;
+        height: 100%;
     }
 
     .post-title-small {
