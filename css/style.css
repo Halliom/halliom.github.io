@@ -54,15 +54,10 @@ body {
 
 .post-title-small {
     font-family: 'Raleway', sans-serif;
-    font-size: 1.75rem;
+    font-size: 2rem;
     font-weight: 700;
     
     color: #2f2f2f;
-
-    padding-bottom: 0.33rem;
-    border-bottom-style: solid;
-    border-bottom-color: #bababa;
-    border-bottom-width: 1px;
 }
 
 .post-title-big {
@@ -75,7 +70,7 @@ body {
 
 .post-body-small {
     font-family: 'Open Sans', sans-serif;
-    font-size: 1rem;
+    font-size: 1.2rem;
     font-weight: 400;
 }
 
@@ -144,5 +139,18 @@ body {
     .page-content {
         padding-left: 10px;
         padding-right: 10px;
+    }
+
+    .post-title-small {
+        padding-left: 0.33rem;
+
+        padding-bottom: 0.33rem;
+        border-bottom-style: solid;
+        border-bottom-color: #bababa;
+        border-bottom-width: 1px;
+    }
+
+    .post-body-small {
+        padding-left: 0.5rem;
     }
 }
