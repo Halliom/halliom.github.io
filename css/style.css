@@ -62,16 +62,19 @@ body {
     font-family: 'Raleway', sans-serif;
     font-size: 2rem;
     font-weight: 700;
-    
-    color: #2f2f2f;
+
+    color: #515858;
 }
 
-.post-title-small > a{
+.post-title-small > a,
+.post-title-small > a:visited {
     text-decoration: none;
+    color: #515858;
 }
 
-.post-title-small > a:visited{
-    color: #2f2f2f;
+.post-title-small > a:hover,
+.post-title-small > a:focus {
+    color: #778181;
 }
 
 .post-title-big {
@@ -79,7 +82,7 @@ body {
     font-size: 2.5rem;
     font-weight: 800;
 
-    color: #161616;
+    color: #515858;
 }
 
 .post-body-small {
@@ -224,9 +227,6 @@ body {
     .page-content {
         position: relative;
 
-        padding-left: 20%;
-        padding-right: 20%;
-
         height: 100%;
     }
 
@@ -244,5 +244,12 @@ body {
 
     .post-body-small {
         padding-left: 10px;
+    }
+}
+
+@media (min-width: 880px) {
+    .site-wrapper {
+        padding-left: 12.5%;
+        padding-right: 12.5%;
     }
 }
