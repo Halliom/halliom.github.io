@@ -83,6 +83,25 @@ body {
     width: 33.333333%;
 }
 
+.sidebar-list {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 400;
+}
+
+.post-link {
+    padding-left: 0.25rem;
+
+    font-weight: 600;
+    text-decoration: none;
+    color: black;
+}
+
+.post-link:focus,
+.post-link:hover {
+    text-decoration: underline;
+}
+
 .post-title-small {
     font-family: 'Raleway', sans-serif;
     font-size: 2rem;
