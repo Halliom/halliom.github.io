@@ -288,6 +288,9 @@ body {
     }
 
     .page-content {
+        padding-left: 10px;
+        padding-right: 5px;
+
         width: 66.666666%;
     }
 
@@ -296,8 +299,6 @@ body {
     }
 
     .post-title-small {
-        padding-left: 10px;
-
         width: fit-content;
         
         padding-bottom: 0.33rem;
@@ -306,18 +307,8 @@ body {
         border-bottom-width: 1px;
     }
     
-    .post-title-big {
-        padding-left: 10px;
-        
+    .post-title-big {        
         width: fit-content;
-    }
-
-    .post-body-small {
-        padding-left: 10px;
-    }
-
-    .post-body-big {
-        padding-left: 10px;
     }
 }
 
