@@ -10,6 +10,15 @@ body {
 .site-wrapper {
     padding-left: 5%; 
     padding-right: 5%; 
+
+    box-sizing: border-box;
+}
+
+/* Clearfix */
+.site-wrapper:after {
+    display: table;
+    clear: both;
+    content: '';
 }
 
 .blog-header {
@@ -53,9 +62,25 @@ body {
 }
 
 .page-content {
+    box-sizing: inherit;
+
+    float: left;
+    
+    width: 100%;
+    
     font-family: 'Open Sans', sans-serif;
     font-size: 1rem;
     font-weight: 400;
+}
+
+.sidebar {
+    display: none;
+
+    box-sizing: inherit;
+    
+    float: left;
+
+    width: 33.333333%;
 }
 
 .post-title-small {
@@ -225,9 +250,11 @@ body {
     }
 
     .page-content {
-        position: relative;
+        width: 66.666666%;
+    }
 
-        height: 100%;
+    .sidebar {
+        display: block;
     }
 
     .post-title-small {

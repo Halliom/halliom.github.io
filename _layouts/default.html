@@ -7,6 +7,13 @@
             <div class="page-content">
                 {{ content }}
             </div>
+            <div class="sidebar">
+                <ul>
+                    {% for post in site.posts %}
+                    <li>{{ post.date | date: "%Y-%M-%d" }}<a href="{{ post.url }}">{{ post.title }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
             {% include footer.html %}
         </div>
     </body>
