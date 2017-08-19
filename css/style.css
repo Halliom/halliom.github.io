@@ -81,6 +81,8 @@ body {
     float: left;
 
     width: 33.333333%;
+
+    padding-left: 15px;
 }
 
 .twitter-feed {
