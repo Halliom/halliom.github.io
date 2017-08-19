@@ -82,11 +82,16 @@ body {
 
     width: 33.333333%;
 
+    margin-top: 5px;    
     padding-left: 15px;
+
+    border-left-style: solid;
+    border-left-color: #E4E4E4;
+    border-left-width: 1px;
 }
 
 .twitter-feed {
-    padding-top: 5px;
+    padding-bottom: 5px;
 
     border-bottom-style: solid;
     border-bottom-color: #E4E4E4;
