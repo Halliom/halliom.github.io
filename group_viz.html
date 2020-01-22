@@ -1,0 +1,180 @@
+<select id="skill-selector">
+    <option value="How would you rate your Information Visualization skills?">Visualization</option>
+    <option value="How would you rate your statistical skills?">Stats</option>
+    <option value="How would you rate your mathematics skills?">Math</option>
+    <option value="How would you rate your drawing and artistic skills?">Arts</option>
+    <option value="How would you rate your computer usage skills?">Computer</option>
+    <option value="How would you rate your programming skills?">Programming</option>
+    <option value="How would you rate your computer graphics programming skills?">Graphics</option>
+    <option value="How would you rate your human-computer interaction programming skills?">HCI</option>
+    <option value="How would you rate your user experience evaluation skills?">UX</option>
+    <option value="How would you rate your communication skills?">Communication</option>
+    <option value="How would you rate your collaboration skills?">Collaboration</option>
+    <option value="How would you rate your code repository skills?">Repository</option>
+</select>
+<select id="grouping-selector">
+    <option value="What is your Major?">Major</option>
+    <option value="Please, tell me about yourself. What interest you? Do you have any hobbies?">Interests</option>
+</select>
+<svg width="960" height="600" style="cursor: default;">
+    <circle r=8 cx="8" cy="14" fill="#F00"></circle>
+    <text x="18" y="20">Computer Science</text>
+    
+    <circle r=8 cx="8" cy="34" fill="#00F"></circle>
+    <text x="18" y="40">Media Technology</text>
+    
+    <circle r=8 cx="8" cy="54" fill="#3F3"></circle>
+    <text x="18" y="60">Human-Computer Interaction</text>
+    
+    <circle r=8 cx="8" cy="74" fill="#777"></circle>
+    <text x="18" y="80">Other</text>
+</svg>
+
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<style>
+</style>
+
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script>
+function stringSimilarity(a, b) {
+    var aTokens = a.match(/\S+/g);
+    var bTokens = b.match(/\S+/g);
+
+    if (aTokens == null || bTokens == null) {
+        return 0;
+    }
+
+    var count = 0;
+    for (const aToken of aTokens) {
+        for (const bToken of bTokens) {
+            if (aToken == bToken) {
+                ++count;
+            } 
+        }
+    }
+
+    return count / 200;
+}
+
+d3.csv("data.csv", function(data) {
+    var n = data.length;
+    var nodes = d3.range(n).map(function(i) {
+        return { index: i, name: data[i].Alias };
+    });
+
+    var links = [];
+    var skill = d3.select("#grouping-selector").property("value");
+    for (var x = 0; x < n; ++x) {
+        for (var y = x + 1; y < n; ++y) {
+            links.push({ source: x, target: y });
+        }
+    }
+
+    var svg = d3.select("svg"),
+        width = svg.attr("width"),
+        height = svg.attr("height");
+    
+    var simulation = d3.forceSimulation(nodes)
+        .force("charge", d3.forceManyBody())
+        .force("link", d3.forceLink(links)
+            .distance(200)
+            .strength(function(d) {
+                var selectedOption = d3.select("#grouping-selector").property("value")
+                return stringSimilarity(data[d.target.index][selectedOption], data[d.source.index][selectedOption])
+            }))
+        .force("center", d3.forceCenter(width / 2, height / 2))
+        .on("tick", onTick);
+
+    //var link = svg.append("g")
+    //    .attr("class", "links")
+    //    .selectAll("line")
+    //    .data(links)
+    //    .enter().append("line")
+    //    .attr("stroke", "#FFF");
+
+    var node = svg.append("g")
+        .attr("class", "nodes")
+        .selectAll("g")
+        .data(nodes)
+        .enter().append("g")
+        .on("mouseover", function(d) {
+            d3.select(this).select("text")
+                .transition()
+                .duration(200)
+                .attr("fill-opacity", 1.0);
+        })
+        .on("mouseout", function(d) {
+            d3.select(this).select("text")
+                .transition()
+                .duration(200)
+                .attr("fill-opacity", 0.0);
+        });
+
+    var circles = node.append("circle")
+        .attr("r", function(d) { return data[d.index][d3.select("#skill-selector").property("value")] * 1.5 + 2; })
+        .attr("fill", function(d) { 
+            const major = data[d.index]["What is your Major?"];
+            if (major.includes("Computer Science")) {
+                return "#F00";
+            } else if (major.includes("Media Technology")) {
+                return "#00F";
+            } else if (major.includes("Human-Computer Interaction")) {
+                return "#3F3";
+            } else {
+                console.log(data[d.index]["What is your Major?"]);
+
+                return "#777";
+            }
+        });
+
+    var labels = node.append("text")
+        .text(function(d) {
+            return d.name;
+        })
+        .attr("x", 6)
+        .attr("y", 3)
+        .attr("fill-opacity", 0);
+
+    var sizeSelector = d3.select("#skill-selector").on("change", function() {
+        var selectedOption = d3.select(this).property("value");
+        for (var i = 0; i < n; ++i) {
+            nodes[i].size = data[i][selectedOption];
+        }
+        circles
+            .transition()
+            .duration(500)
+            .attr("r", function(d) { return data[d.index][selectedOption] * 1.5 + 2; });
+    });
+
+    var groupingSelector = d3.select("#grouping-selector").on("change", function() {
+        var selectedOption = d3.select(this).property("value");
+        
+        simulation.stop();
+
+        simulation = d3.forceSimulation(nodes)
+            .force("charge", d3.forceManyBody())
+            .force("link", d3.forceLink(links)
+                .distance(Math.random() * 100 + 50)
+                .strength(function(d) {
+                    return stringSimilarity(data[d.target.index][selectedOption], data[d.source.index][selectedOption])
+                }))
+            .force("center", d3.forceCenter(width / 2, height / 2))
+            .on("tick", onTick);
+    });
+
+    function onTick() {
+        //link
+        //    .attr("x1", function(d) { return d.source.x; })
+        //    .attr("y1", function(d) { return d.source.y; })
+        //    .attr("x2", function(d) { return d.target.x; })
+        //    .attr("y2", function(d) { return d.target.y; });
+
+        node
+            .attr("transform", function(d) {
+                return "translate(" + d.x + "," + d.y + ")";
+            });
+    }
+});
+</script>
