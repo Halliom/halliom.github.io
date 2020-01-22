@@ -1,21 +1,28 @@
-<select id="skill-selector">
-    <option value="How would you rate your Information Visualization skills?">Visualization</option>
-    <option value="How would you rate your statistical skills?">Stats</option>
-    <option value="How would you rate your mathematics skills?">Math</option>
-    <option value="How would you rate your drawing and artistic skills?">Arts</option>
-    <option value="How would you rate your computer usage skills?">Computer</option>
-    <option value="How would you rate your programming skills?">Programming</option>
-    <option value="How would you rate your computer graphics programming skills?">Graphics</option>
-    <option value="How would you rate your human-computer interaction programming skills?">HCI</option>
-    <option value="How would you rate your user experience evaluation skills?">UX</option>
-    <option value="How would you rate your communication skills?">Communication</option>
-    <option value="How would you rate your collaboration skills?">Collaboration</option>
-    <option value="How would you rate your code repository skills?">Repository</option>
-</select>
-<select id="grouping-selector">
-    <option value="What is your Major?">Major</option>
-    <option value="Please, tell me about yourself. What interest you? Do you have any hobbies?">Interests</option>
-</select>
+<span>
+    <label for="skill-selector">Node size</label>
+    <select id="skill-selector">
+        <option value="How would you rate your Information Visualization skills?">Visualization skills</option>
+        <option value="How would you rate your statistical skills?">Stats skills</option>
+        <option value="How would you rate your mathematics skills?">Math skills</option>
+        <option value="How would you rate your drawing and artistic skills?">Arts skills</option>
+        <option value="How would you rate your computer usage skills?">Computer skills</option>
+        <option value="How would you rate your programming skills?">Programming skills</option>
+        <option value="How would you rate your computer graphics programming skills?">Graphics skills</option>
+        <option value="How would you rate your human-computer interaction programming skills?">HCI skills</option>
+        <option value="How would you rate your user experience evaluation skills?">UX skills</option>
+        <option value="How would you rate your communication skills?">Communication skills</option>
+        <option value="How would you rate your collaboration skills?">Collaboration skills</option>
+        <option value="How would you rate your code repository skills?">Repository skills</option>
+    </select>
+</span>
+
+<span>
+    <label>Grouping</label>
+    <select id="grouping-selector">
+        <option value="What is your Major?">Major</option>
+        <option value="Please, tell me about yourself. What interest you? Do you have any hobbies?">Interests</option>
+    </select>
+</span>
 <svg width="960" height="600" style="cursor: default;">
     <circle r=8 cx="8" cy="14" fill="#F00"></circle>
     <text x="18" y="20">Computer Science</text>
@@ -39,8 +46,8 @@
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script>
 function stringSimilarity(a, b) {
-    var aTokens = a.match(/\S+/g);
-    var bTokens = b.match(/\S+/g);
+    var aTokens = a.match(/\w+/g);
+    var bTokens = b.match(/\w+/g);
 
     if (aTokens == null || bTokens == null) {
         return 0;
@@ -54,8 +61,9 @@ function stringSimilarity(a, b) {
             } 
         }
     }
+    count /= Math.min(aTokens.length, bTokens.length);
 
-    return count / 200;
+    return count;
 }
 
 d3.csv("data.csv", function(data) {
@@ -65,10 +73,12 @@ d3.csv("data.csv", function(data) {
     });
 
     var links = [];
-    var skill = d3.select("#grouping-selector").property("value");
     for (var x = 0; x < n; ++x) {
         for (var y = x + 1; y < n; ++y) {
-            links.push({ source: x, target: y });
+            var linkStrength = getStrength(x, y, d3.select("#grouping-selector").property("value"));
+            if (linkStrength > 0) {
+                links.push({ source: x, target: y, strength: linkStrength });
+            }
         }
     }
 
@@ -77,13 +87,10 @@ d3.csv("data.csv", function(data) {
         height = svg.attr("height");
     
     var simulation = d3.forceSimulation(nodes)
-        .force("charge", d3.forceManyBody())
+        .force("charge", d3.forceManyBody().strength(-50))
         .force("link", d3.forceLink(links)
-            .distance(200)
-            .strength(function(d) {
-                var selectedOption = d3.select("#grouping-selector").property("value")
-                return stringSimilarity(data[d.target.index][selectedOption], data[d.source.index][selectedOption])
-            }))
+            .distance(function() { return d3.select("#grouping-selector").property("value") == "What is your Major?" ? 100 : 200; })
+            .strength(function(d) { return d.strength; }))
         .force("center", d3.forceCenter(width / 2, height / 2))
         .on("tick", onTick);
 
@@ -98,44 +105,54 @@ d3.csv("data.csv", function(data) {
         .attr("class", "nodes")
         .selectAll("g")
         .data(nodes)
-        .enter().append("g")
+        .enter().append("g");
+    
+    var circles = node.append("circle")
+        .attr("r", function(d) { return data[d.index][d3.select("#skill-selector").property("value")] * 1.5 + 2; })
+        .attr("fill", function(d) { 
+            const major = data[d.index]["What is your Major?"];
+            if (stringSimilarity("Computer Science", major) > 0.5) {
+                return "#F00";
+            } else if (stringSimilarity("Media Technology", major) > 0.5) {
+                return "#00F";
+            } else if (stringSimilarity("Human-Computer Interaction", major) > 0.5) {
+                return "#3F3";
+            } else {
+                return "#777";
+            }
+        })
         .on("mouseover", function(d) {
-            d3.select(this).select("text")
+            d3.select(this.parentNode).select("text")
                 .transition()
                 .duration(200)
                 .attr("fill-opacity", 1.0);
         })
         .on("mouseout", function(d) {
-            d3.select(this).select("text")
+            d3.select(this.parentNode).select("text")
                 .transition()
                 .duration(200)
                 .attr("fill-opacity", 0.0);
         });
 
-    var circles = node.append("circle")
-        .attr("r", function(d) { return data[d.index][d3.select("#skill-selector").property("value")] * 1.5 + 2; })
-        .attr("fill", function(d) { 
-            const major = data[d.index]["What is your Major?"];
-            if (major.includes("Computer Science")) {
-                return "#F00";
-            } else if (major.includes("Media Technology")) {
-                return "#00F";
-            } else if (major.includes("Human-Computer Interaction")) {
-                return "#3F3";
-            } else {
-                console.log(data[d.index]["What is your Major?"]);
-
-                return "#777";
-            }
-        });
-
     var labels = node.append("text")
         .text(function(d) {
-            return d.name;
+            return d.name + " - " + data[d.index]["What is your Major?"];
         })
         .attr("x", 6)
         .attr("y", 3)
+        .attr("pointer-events", "none")
         .attr("fill-opacity", 0);
+    
+    var drag_handler = d3.drag()
+        .on("drag", onDrag)
+        .on("end", onDragEnd);
+    var zoom_handler = d3.zoom()
+        .on("zoom", function() {
+            svg.select("g").attr("transform", d3.event.transform);
+        });
+
+    drag_handler(svg);
+    zoom_handler(svg); 
 
     var sizeSelector = d3.select("#skill-selector").on("change", function() {
         var selectedOption = d3.select(this).property("value");
@@ -153,16 +170,27 @@ d3.csv("data.csv", function(data) {
         
         simulation.stop();
 
+        links = [];
+        for (var x = 0; x < n; ++x) {
+            for (var y = x + 1; y < n; ++y) {
+                var linkStrength = getStrength(x, y, d3.select("#grouping-selector").property("value"));
+                if (linkStrength > 0) {
+                    links.push({ source: x, target: y, strength: linkStrength });
+                }
+            }
+        }
+
         simulation = d3.forceSimulation(nodes)
             .force("charge", d3.forceManyBody())
             .force("link", d3.forceLink(links)
-                .distance(Math.random() * 100 + 50)
-                .strength(function(d) {
-                    return stringSimilarity(data[d.target.index][selectedOption], data[d.source.index][selectedOption])
-                }))
+                .distance(function() { return d3.select("#grouping-selector").property("value") == "What is your Major?" ? 100 : 200; })
+                .strength(function(d) { return d.strength; }))
             .force("center", d3.forceCenter(width / 2, height / 2))
             .on("tick", onTick);
     });
+
+    var panX = 0;
+    var panY = 0;
 
     function onTick() {
         //link
@@ -173,8 +201,42 @@ d3.csv("data.csv", function(data) {
 
         node
             .attr("transform", function(d) {
-                return "translate(" + d.x + "," + d.y + ")";
+                return "translate(" + (d.x + panX) + "," + (d.y + panY) + ")";
             });
     }
+
+    function onDrag(d) {
+        panX += d3.event.dx;
+        panY += d3.event.dy;
+        onTick();
+    }
+
+    function onDragEnd() {
+        onTick();
+    }
+
+    function getStrength(x, y, grouping) {
+        if (grouping == "What is your Major?") {
+            return data[x][grouping] == data[y][grouping];
+        } else {
+            return stringSimilarity(data[x][grouping], data[y][grouping]);
+        }
+    }
 });
+
+//svg.selectAll("circle")
+//    .data(data)
+//    .enter().append("circle")
+//    .attr("fill", function(d) { return d.color; })
+//    .attr("cx", function(d, i) { return i * 100 + 20 } )
+//    .attr("cy", function(d) { return d.y } )
+//    .attr("r", function(d) { return Math.random() * 20; })
+//    .on("click", function(e, i) {
+//        data[i].y += 20
+//        svg.selectAll("circle")
+//            .transition()
+//            .delay(500)
+//            .attr("cy", function(d) { return d.y } );
+//    });
+
 </script>
