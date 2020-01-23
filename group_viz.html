@@ -23,7 +23,11 @@
         <option value="Please, tell me about yourself. What interest you? Do you have any hobbies?">Interests</option>
     </select>
 </span>
-<svg width="960" height="600" style="cursor: default;">
+
+<ul>
+</ul>
+
+<svg width="960" height="540" style="cursor: default;">
     <circle r=8 cx="8" cy="14" fill="#F00"></circle>
     <text x="18" y="20">Computer Science</text>
     
@@ -106,6 +110,11 @@ d3.csv("data.csv", function(data) {
         .selectAll("g")
         .data(nodes)
         .enter().append("g");
+
+    var selectionList = [];
+
+    var selection = svg.append("g")
+        .attr("class", "selection");
     
     var circles = node.append("circle")
         .attr("r", function(d) { return data[d.index][d3.select("#skill-selector").property("value")] * 1.5 + 2; })
@@ -119,6 +128,43 @@ d3.csv("data.csv", function(data) {
                 return "#3F3";
             } else {
                 return "#777";
+            }
+        })
+        .on("click", function(d) {
+            if (d3.select(this).attr("stroke-width") > 0) {
+                d3.select(this)
+                    .transition()
+                    .duration(300)
+                    .attr("stroke-width", 0);
+                
+                var index = selectionList.indexOf(d.index);
+                if (index >= -1) {
+                    selectionList.splice(index, 1);
+                }
+
+                selection
+                    .selectAll("text")
+                    .data(selectionList)
+                    .exit()
+                    .remove();
+            } else {
+                d3.select(this)
+                    .transition()
+                    .duration(300)
+                    .attr("stroke-width", 2)
+                    .attr("stroke", "#222");
+                
+                selectionList.push(d.index);
+                selection
+                        .selectAll("text")
+                        .data(selectionList)
+                        .enter()
+                        .append("text")
+                        .attr("y", function(d) {
+                            var index = selectionList.indexOf(d);
+                            return height - ((index + 1) * 16);
+                        })
+                        .text(function (d) { return data[d].Alias; });
             }
         })
         .on("mouseover", function(d) {
@@ -223,20 +269,5 @@ d3.csv("data.csv", function(data) {
         }
     }
 });
-
-//svg.selectAll("circle")
-//    .data(data)
-//    .enter().append("circle")
-//    .attr("fill", function(d) { return d.color; })
-//    .attr("cx", function(d, i) { return i * 100 + 20 } )
-//    .attr("cy", function(d) { return d.y } )
-//    .attr("r", function(d) { return Math.random() * 20; })
-//    .on("click", function(e, i) {
-//        data[i].y += 20
-//        svg.selectAll("circle")
-//            .transition()
-//            .delay(500)
-//            .attr("cy", function(d) { return d.y } );
-//    });
 
 </script>
