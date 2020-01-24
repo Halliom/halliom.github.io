@@ -156,16 +156,24 @@ d3.csv("data.csv", function(data) {
                 
                 selectionList.push(d.index);
                 selection
-                        .selectAll("text")
-                        .data(selectionList)
-                        .enter()
-                        .append("text")
-                        .attr("y", function(d) {
-                            var index = selectionList.indexOf(d);
-                            return height - ((index + 1) * 16);
-                        })
-                        .text(function (d) { return data[d].Alias; });
+                    .selectAll("text")
+                    .data(selectionList)
+                    .enter()
+                    .append("text")
+                    .attr("y", function(d) {
+                        var index = selectionList.indexOf(d);
+                        return height - ((index + 1) * 16);
+                    })
+                    .text(function (d) { return data[d].Alias; });
             }
+
+            selection
+                .selectAll("text")
+                .attr("y", function(d) {
+                    var index = selectionList.indexOf(d);
+                    return height - ((index + 1) * 16);
+                })
+                .text(function (d) { return data[d].Alias; });
         })
         .on("mouseover", function(d) {
             d3.select(this.parentNode).select("text")
@@ -239,12 +247,6 @@ d3.csv("data.csv", function(data) {
     var panY = 0;
 
     function onTick() {
-        //link
-        //    .attr("x1", function(d) { return d.source.x; })
-        //    .attr("y1", function(d) { return d.source.y; })
-        //    .attr("x2", function(d) { return d.target.x; })
-        //    .attr("y2", function(d) { return d.target.y; });
-
         node
             .attr("transform", function(d) {
                 return "translate(" + (d.x + panX) + "," + (d.y + panY) + ")";
