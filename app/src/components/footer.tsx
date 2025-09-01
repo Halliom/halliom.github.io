@@ -1,4 +1,5 @@
 import React from "react";
+import { NavLink } from "react-router-dom";
 
 export const Footer: React.FC = () => {
   return (
@@ -6,6 +7,7 @@ export const Footer: React.FC = () => {
       <span>Copyright 2025 Johan Wieslander</span>
       <a href="https://www.linkedin.com/in/johan-wieslander-080756113/" target="_blank" rel="noreferrer">Linkedin</a>
       <a href="https://github.com/Halliom" target="_blank" rel="noreferrer">Github</a>
+      <NavLink to="/projects">Projects</NavLink>
     </div>
   );
 };
