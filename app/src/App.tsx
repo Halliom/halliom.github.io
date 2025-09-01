@@ -3,8 +3,8 @@ import { Footer } from "./components/footer";
 function App() {
   return (
     <div className="flex flex-col w-screen h-screen justify-between items-center">
-      <div className="max-w-[90vw] lg:max-w-xl ">
-        <h1 className="text-3xl font-bold pt-72 pb-12">Johan Wieslander</h1>
+      <div className="w-full px-4 md:px-0 md:max-w-[90vw] lg:max-w-xl pb-8">
+        <h1 className="w-full text-3xl font-bold pt-36 lg:pt-64 pb-12">Johan Wieslander</h1>
 
         <div className="flex flex-col gap-4">
           <p>
