@@ -21,24 +21,29 @@ type Props<T extends HoursMinutesSeconds | MinutesSeconds> = {
   onChange: (time: T) => void;
 };
 
-const PhoneTimeInput: React.FC<{
+export const NumberInput: React.FC<{
   value: number;
+  allowDecimals?: boolean;
   onChange: (value: number) => void;
-}> = ({ value, onChange }) => {
+}> = ({ value, allowDecimals = false, onChange }) => {
   const handleChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      const newValue = parseInt(event.target.value, 10);
+      let newValue = 0
+      if (allowDecimals) {
+        newValue = Number(event.target.value)
+      } else {
+        newValue = parseInt(event.target.value, 10);
+      }
       if (Number.isNaN(newValue)) return;
-
       onChange(newValue);
     },
-    [onChange]
+    [allowDecimals, onChange]
   );
 
   return (
     <input
       type="number"
-      className="w-16 p-2 outline-1 outline-zinc-900 focus-visible:outline-1 focus-visible:outline-zinc-700 rounded-md transition-all"
+      className="w-16 p-2 bg-zinc-800 active:bg-zinc-900 focus-visible:outline-1 focus-visible:outline-zinc-700 outline-zinc-700 rounded-md transition-all"
       value={value}
       onChange={handleChange}
     />
@@ -56,39 +61,43 @@ export const TimeInput = <T extends HoursMinutesSeconds | MinutesSeconds>({
 
   const updateValue = React.useCallback(
     (seconds: number, minutes: number, hours?: number) => {
-      if (seconds < 0) {
-        seconds = seconds % 60;
+      // Handle seconds
+      while (seconds < 0) {
+        seconds += 60;
         minutes -= 1;
       }
-      if (seconds > 59) {
-        seconds = seconds % 60;
+      while (seconds >= 60) {
+        seconds -= 60;
         minutes += 1;
       }
-      if (minutes < 0) {
+
+      // Handle minutes
+      while (minutes < 0) {
         if (hours) {
-          minutes = minutes % 60;
+          minutes += 60;
           hours -= 1;
         } else {
           minutes = 0;
+          break;
         }
       }
-      if (minutes > 59) {
+      while (minutes >= 60) {
         if (hours) {
-          minutes = minutes % 60;
+          minutes -= 60;
           hours += 1;
         } else {
           minutes = 59;
+          break;
         }
       }
-      if (hours && hours < 0) {
-        hours = 0;
-      }
-      if (hours && hours > 59) {
-        hours = 59;
+      if (hours !== undefined) {
+        hours = Math.max(0, Math.min(99, hours));
       }
 
       setInternalValue({ seconds, minutes, hours });
-      onChange(hours ? { seconds, minutes, hours } : { seconds, minutes });
+      onChange(
+        (hours ? { seconds, minutes, hours } : { seconds, minutes }) as T
+      );
     },
     [onChange]
   );
@@ -119,21 +128,23 @@ export const TimeInput = <T extends HoursMinutesSeconds | MinutesSeconds>({
     [internalValue, updateValue]
   );
 
-  console.log("state", internalValue);
-
   return (
-    <div className="flex flex-row gap-1">
+    <div className="flex flex-row items-center gap-1">
       {type === "hh:mm:ss" && (
-        <PhoneTimeInput
-          value={(internalValue as HoursMinutesSeconds).hours}
-          onChange={handleChange("hours")}
-        />
+        <>
+          <NumberInput
+            value={(internalValue as HoursMinutesSeconds).hours}
+            onChange={handleChange("hours")}
+          />
+          <span className="text-xl">:</span>
+        </>
       )}
-      <PhoneTimeInput
+      <NumberInput
         value={internalValue.minutes}
         onChange={handleChange("minutes")}
       />
-      <PhoneTimeInput
+      <span className="text-xl">:</span>
+      <NumberInput
         value={internalValue.seconds}
         onChange={handleChange("seconds")}
       />
