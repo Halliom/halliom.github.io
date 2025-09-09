@@ -6,6 +6,7 @@ import {
   type MinutesSeconds,
 } from "../../../components/time-input";
 import { NumberInput } from "../../../components/number-input";
+import { convertTimeToSeconds } from "../../../utils/time";
 
 type Setting = "pace" | "distance" | "time";
 
@@ -23,20 +24,32 @@ export const PaceCalculatorPage: React.FC = () => {
 
   const [operations, setOperations] = React.useState<Setting[]>([]);
 
-  const handleConversion = React.useCallback((setting: Setting) => {
-    switch (setting) {
-      case "pace":
-        break;
-      case "time":
-        break;
-      case "distance":
-        break;
-    }
-  }, []);
+  const handleConversion = React.useCallback(
+    (setting: Setting) => {
+      switch (setting) {
+        case "pace": {
+          const seconds = convertTimeToSeconds(time);
+          const secondsPerKm = seconds / distance;
+          console.log({ time, seconds, secondsPerKm })
+          setPace(() => ({
+            minutes: Math.floor(secondsPerKm / 60),
+            seconds: secondsPerKm % 60,
+          }));
+          break;
+        }
+        case "time":
+          break;
+        case "distance":
+          break;
+      }
+    },
+    [distance, time]
+  );
 
   const handleOperation = React.useCallback(
     (operation: Setting) => {
       let newOperations = [...operations];
+      console.log('incoming', operation, newOperations, operations)
       if (
         operations.length === 0 ||
         operations[operations.length - 1] !== operation
@@ -51,6 +64,7 @@ export const PaceCalculatorPage: React.FC = () => {
         const toChange = (["pace", "time", "distance"] as Setting[]).find(
           (otherOp) => !newOperations.includes(otherOp)
         );
+        console.log('changes', newOperations, toChange)
         if (toChange) {
           handleConversion(toChange);
         }
