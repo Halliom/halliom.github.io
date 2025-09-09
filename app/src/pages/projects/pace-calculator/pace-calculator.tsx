@@ -1,11 +1,11 @@
 import React from "react";
 import { Title } from "../../../components/title";
 import {
-  NumberInput,
   TimeInput,
   type HoursMinutesSeconds,
   type MinutesSeconds,
 } from "../../../components/time-input";
+import { NumberInput } from "../../../components/number-input";
 
 type Setting = "pace" | "distance" | "time";
 

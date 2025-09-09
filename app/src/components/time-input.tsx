@@ -1,4 +1,5 @@
 import React from "react";
+import { IMask, IMaskInput } from "react-imask";
 
 export type HoursMinutesSeconds = {
   hours: number;
@@ -15,39 +16,63 @@ type Time =
   | { value: HoursMinutesSeconds; type: "hh:mm:ss" }
   | { value: MinutesSeconds; type: "mm:ss" };
 
+type TimeType = Time["type"]
+
 type Props<T extends HoursMinutesSeconds | MinutesSeconds> = {
-  type: Time["type"];
+  type: TimeType;
   value: T;
   onChange: (time: T) => void;
 };
 
-export const NumberInput: React.FC<{
-  value: number;
-  allowDecimals?: boolean;
-  onChange: (value: number) => void;
-}> = ({ value, allowDecimals = false, onChange }) => {
-  const handleChange = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      let newValue = 0
-      if (allowDecimals) {
-        newValue = Number(event.target.value)
-      } else {
-        newValue = parseInt(event.target.value, 10);
-      }
-      if (Number.isNaN(newValue)) return;
-      onChange(newValue);
-    },
-    [allowDecimals, onChange]
-  );
+const divideUnmaskedInputIntoParts = (
+  type: TimeType,
+  input: string
+): number[] | null => {
+  if (type === "hh:mm:ss" && input.length !== 6) return null;
+  if (type === "mm:ss" && input.length !== 4) return null;
 
-  return (
-    <input
-      type="number"
-      className="w-16 p-2 bg-zinc-800 active:bg-zinc-900 focus-visible:outline-1 focus-visible:outline-zinc-700 outline-zinc-700 rounded-md transition-all"
-      value={value}
-      onChange={handleChange}
-    />
-  );
+  switch (type) {
+    case "hh:mm:ss":
+      return [
+        parseInt(input.substring(0, 2), 10),
+        parseInt(input.substring(2, 4), 10),
+        parseInt(input.substring(4, 6), 10),
+      ];
+    case "mm:ss":
+      return [
+        parseInt(input.substring(0, 2), 10),
+        parseInt(input.substring(2, 4), 10),
+      ];
+  }
+};
+
+const parseStringToValue = <T extends HoursMinutesSeconds | MinutesSeconds>(
+  type: TimeType,
+  input: string
+): T | null => {
+  const parts = divideUnmaskedInputIntoParts(type, input);
+  console.log("parts", parts);
+  if (parts === null) return null;
+
+  if (type === "hh:mm:ss" && parts.length === 3) {
+    const [hours, minutes, seconds] = parts;
+    if (
+      hours >= 0 &&
+      hours <= 23 &&
+      minutes >= 0 &&
+      minutes <= 59 &&
+      seconds >= 0 &&
+      seconds <= 59
+    ) {
+      return { hours, minutes, seconds } as T;
+    }
+  } else if (type === "mm:ss" && parts.length === 2) {
+    const [minutes, seconds] = parts;
+    if (minutes >= 0 && minutes <= 59 && seconds >= 0 && seconds <= 59) {
+      return { minutes, seconds } as T;
+    }
+  }
+  return null;
 };
 
 export const TimeInput = <T extends HoursMinutesSeconds | MinutesSeconds>({
@@ -55,99 +80,74 @@ export const TimeInput = <T extends HoursMinutesSeconds | MinutesSeconds>({
   value,
   onChange,
 }: Props<T>) => {
-  const [internalValue, setInternalValue] = React.useState<
-    HoursMinutesSeconds | MinutesSeconds
-  >(value);
+  const ref = React.useRef<HTMLInputElement>(null);
 
-  const updateValue = React.useCallback(
-    (seconds: number, minutes: number, hours?: number) => {
-      // Handle seconds
-      while (seconds < 0) {
-        seconds += 60;
-        minutes -= 1;
+  const formatValueToString = React.useCallback(
+    (val: T): string => {
+      if (type === "hh:mm:ss" && "hours" in val) {
+        return `${val.hours.toString().padStart(2, "0")}:${val.minutes
+          .toString()
+          .padStart(2, "0")}:${val.seconds.toString().padStart(2, "0")}`;
+      } else if (type === "mm:ss" && "minutes" in val) {
+        return `${val.minutes.toString().padStart(2, "0")}:${val.seconds
+          .toString()
+          .padStart(2, "0")}`;
       }
-      while (seconds >= 60) {
-        seconds -= 60;
-        minutes += 1;
-      }
-
-      // Handle minutes
-      while (minutes < 0) {
-        if (hours) {
-          minutes += 60;
-          hours -= 1;
-        } else {
-          minutes = 0;
-          break;
-        }
-      }
-      while (minutes >= 60) {
-        if (hours) {
-          minutes -= 60;
-          hours += 1;
-        } else {
-          minutes = 59;
-          break;
-        }
-      }
-      if (hours !== undefined) {
-        hours = Math.max(0, Math.min(99, hours));
-      }
-
-      setInternalValue({ seconds, minutes, hours });
-      onChange(
-        (hours ? { seconds, minutes, hours } : { seconds, minutes }) as T
-      );
+      return "";
     },
-    [onChange]
+    [type]
   );
 
-  const handleChange = React.useCallback(
-    (changeType: "hours" | "minutes" | "seconds") => (newValue: number) => {
-      switch (changeType) {
-        case "hours":
-          if ("hours" in internalValue)
-            updateValue(internalValue.seconds, internalValue.minutes, newValue);
-          return;
-        case "minutes":
-          updateValue(
-            internalValue.seconds,
-            newValue,
-            "hours" in internalValue ? internalValue.hours : undefined
-          );
-          return;
-        case "seconds":
-          updateValue(
-            newValue,
-            internalValue.minutes,
-            "hours" in internalValue ? internalValue.hours : undefined
-          );
-          return;
+  const handleAccept = React.useCallback(
+    (unmaskedValue: string) => {
+      const parsedValue = parseStringToValue<T>(type, unmaskedValue);
+      if (parsedValue) {
+        onChange(parsedValue);
       }
     },
-    [internalValue, updateValue]
+    [onChange, type]
   );
+
+  const mask = type === "hh:mm:ss" ? "00:00:00" : "00:00";
 
   return (
     <div className="flex flex-row items-center gap-1">
-      {type === "hh:mm:ss" && (
-        <>
-          <NumberInput
-            value={(internalValue as HoursMinutesSeconds).hours}
-            onChange={handleChange("hours")}
-          />
-          <span className="text-xl">:</span>
-        </>
-      )}
-      <NumberInput
-        value={internalValue.minutes}
-        onChange={handleChange("minutes")}
-      />
-      <span className="text-xl">:</span>
-      <NumberInput
-        value={internalValue.seconds}
-        onChange={handleChange("seconds")}
+      <IMaskInput
+        mask={mask}
+        value={formatValueToString(value)}
+        unmask={true}
+        ref={ref}
+        onAccept={handleAccept}
+        placeholder={type === "hh:mm:ss" ? "hh:mm:ss" : "mm:ss"}
+        className="w-32 p-2 bg-zinc-800 active:bg-zinc-900 focus-visible:outline-1 focus-visible:outline-zinc-700 outline-zinc-700 rounded-md transition-all text-left font-mono"
+        blocks={maskedInputBlocks}
+        definitions={maskedInputDefinitions}
       />
     </div>
   );
 };
+
+const maskedInputBlocks = {
+  HH: {
+    mask: IMask.MaskedRange,
+    from: 0,
+    to: 23,
+    maxLength: 2,
+  },
+  MM: {
+    mask: IMask.MaskedRange,
+    from: 0,
+    to: 59,
+    maxLength: 2,
+  },
+  SS: {
+    mask: IMask.MaskedRange,
+    from: 0,
+    to: 59,
+    maxLength: 2,
+  },
+};
+
+const maskedInputDefinitions = {
+  "0": /[0-9]/,
+}
