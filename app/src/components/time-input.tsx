@@ -21,6 +21,7 @@ type TimeType = Time["type"]
 type Props<T extends HoursMinutesSeconds | MinutesSeconds> = {
   type: TimeType;
   value: T;
+  disabled?: boolean
   onChange: (time: T) => void;
 };
 
@@ -78,6 +79,7 @@ const parseStringToValue = <T extends HoursMinutesSeconds | MinutesSeconds>(
 export const TimeInput = <T extends HoursMinutesSeconds | MinutesSeconds>({
   type,
   value,
+  disabled,
   onChange,
 }: Props<T>) => {
   const ref = React.useRef<HTMLInputElement>(null);
@@ -114,6 +116,7 @@ export const TimeInput = <T extends HoursMinutesSeconds | MinutesSeconds>({
     <div className="flex flex-row items-center gap-1">
       <IMaskInput
         mask={mask}
+        disabled={disabled}
         value={formatValueToString(value)}
         unmask={true}
         ref={ref}

@@ -7,8 +7,32 @@ import {
 } from "../../../components/time-input";
 import { NumberInput } from "../../../components/number-input";
 import { convertTimeToSeconds } from "../../../utils/time";
+import clsx from "clsx";
 
 type Setting = "pace" | "distance" | "time";
+
+const SettingSelectorButton: React.FC<React.ComponentProps<"button">> = ({
+  children,
+  disabled,
+  ...props
+}) => {
+  // TODO: Do focus and similar classes as well
+  return (
+    <div
+      className={clsx(
+        disabled
+          ? "bg-zinc-500/10 !cursor-default outline-2 !outline-amber-500"
+          : "bg-zinc-800 hover:outline-zinc-400 hover:bg-zinc-900",
+          "px-3 py-2 hover:outline-2 outline-2 outline-zinc-800",
+          "rounded-lg",
+          "transition-all duration-200"
+      )}
+    >
+      <button {...props} disabled={disabled}>O</button>
+      {children}
+    </div>
+  );
+};
 
 export const PaceCalculatorPage: React.FC = () => {
   const [pace, setPace] = React.useState<MinutesSeconds>({
@@ -22,80 +46,56 @@ export const PaceCalculatorPage: React.FC = () => {
   });
   const [distance, setDistance] = React.useState<number>(10);
 
-  const [operations, setOperations] = React.useState<Setting[]>([]);
+  const [lockedSetting, setLockedSetting] = React.useState<Setting>("pace");
 
-  const handleConversion = React.useCallback(
-    (setting: Setting) => {
-      switch (setting) {
-        case "pace": {
-          const seconds = convertTimeToSeconds(time);
-          const secondsPerKm = seconds / distance;
-          console.log({ time, seconds, secondsPerKm })
-          setPace(() => ({
-            minutes: Math.floor(secondsPerKm / 60),
-            seconds: secondsPerKm % 60,
-          }));
-          break;
-        }
-        case "time":
-          break;
-        case "distance":
-          break;
+  const handleConversion = React.useCallback(() => {
+    switch (lockedSetting) {
+      case "pace": {
+        const seconds = convertTimeToSeconds(time);
+        const secondsPerKm = seconds / distance;
+        console.log({ time, seconds, secondsPerKm });
+        setPace(() => ({
+          minutes: Math.floor(secondsPerKm / 60),
+          seconds: secondsPerKm % 60,
+        }));
+        break;
       }
-    },
-    [distance, time]
-  );
-
-  const handleOperation = React.useCallback(
-    (operation: Setting) => {
-      let newOperations = [...operations];
-      console.log('incoming', operation, newOperations, operations)
-      if (
-        operations.length === 0 ||
-        operations[operations.length - 1] !== operation
-      ) {
-        if (operations.length > 1) {
-          newOperations = [...operations.slice(1), operation];
-        } else {
-          newOperations = [...operations, operation];
-        }
-      }
-      if (newOperations.length === 2) {
-        const toChange = (["pace", "time", "distance"] as Setting[]).find(
-          (otherOp) => !newOperations.includes(otherOp)
-        );
-        console.log('changes', newOperations, toChange)
-        if (toChange) {
-          handleConversion(toChange);
-        }
-      }
-      setOperations(newOperations);
-    },
-    [handleConversion, operations]
-  );
+      case "time":
+        break;
+      case "distance":
+        break;
+    }
+  }, [distance, lockedSetting, time]);
 
   const handlePaceChange = React.useCallback(
     (pace: MinutesSeconds) => {
       setPace(pace);
-      handleOperation("pace");
+      handleConversion();
     },
-    [handleOperation]
+    [handleConversion]
   );
 
   const handleTimeChange = React.useCallback(
     (time: HoursMinutesSeconds) => {
       setTime(time);
-      handleOperation("time");
+      handleConversion();
     },
-    [handleOperation]
+    [handleConversion]
   );
 
   const handleDistanceChange = React.useCallback(
     (distance: number) => {
       setDistance(distance);
-      handleOperation("distance");
+      handleConversion();
     },
-    [handleOperation]
+    [handleConversion]
+  );
+
+  const makeLockedSettingChangeHandler = React.useCallback(
+    (setting: Setting) => () => {
+      setLockedSetting(setting);
+    },
+    []
   );
 
   return (
@@ -103,24 +103,34 @@ export const PaceCalculatorPage: React.FC = () => {
       <Title>Pace calculator</Title>
 
       <div className="flex flex-row gap-4">
-        <div>
+        <SettingSelectorButton
+          disabled={lockedSetting === "pace"}
+          onClick={makeLockedSettingChangeHandler("pace")}
+        >
           <span className="text-xl">Pace</span>
-          <TimeInput type="mm:ss" value={pace} onChange={handlePaceChange} />
-        </div>
-        <div>
+          <TimeInput type="mm:ss" value={pace} onChange={handlePaceChange} disabled={lockedSetting === "pace"} />
+        </SettingSelectorButton>
+        <SettingSelectorButton
+          disabled={lockedSetting === "time"}
+          onClick={makeLockedSettingChangeHandler("time")}
+        >
           <span className="text-xl">Time</span>
-          <TimeInput type="hh:mm:ss" value={time} onChange={handleTimeChange} />
-        </div>
-        <div>
+          <TimeInput type="hh:mm:ss" value={time} onChange={handleTimeChange} disabled={lockedSetting === "time"} />
+        </SettingSelectorButton>
+        <SettingSelectorButton
+          disabled={lockedSetting === "distance"}
+          onClick={makeLockedSettingChangeHandler("distance")}
+        >
           <span className="text-xl">Distance</span>
           <div>
             <NumberInput
               allowDecimals
               value={distance}
+              disabled={lockedSetting === "distance"}
               onChange={handleDistanceChange}
             />
           </div>
-        </div>
+        </SettingSelectorButton>
       </div>
     </>
   );
