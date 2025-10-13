@@ -12,3 +12,19 @@ export const convertTimeToSeconds = (
   }
   return seconds;
 };
+
+export const convertSecondsToTime = (
+  inputSeconds: number
+): HoursMinutesSeconds => {
+  const totalSeconds = Math.floor(Math.abs(inputSeconds));
+  const seconds = totalSeconds % 60;
+  const totalMinutes = Math.floor(totalSeconds / 60);
+  const minutes = totalMinutes % 60;
+  const hours = Math.floor(totalMinutes / 60);
+
+  return {
+    hours,
+    minutes,
+    seconds,
+  };
+};

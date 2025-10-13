@@ -6,7 +6,10 @@ import {
   type MinutesSeconds,
 } from "../../../components/time-input";
 import { NumberInput } from "../../../components/number-input";
-import { convertTimeToSeconds } from "../../../utils/time";
+import {
+  convertSecondsToTime,
+  convertTimeToSeconds,
+} from "../../../utils/time";
 import clsx from "clsx";
 
 type Setting = "pace" | "distance" | "time";
@@ -67,6 +70,22 @@ export const PaceCalculatorPage: React.FC = () => {
       time: HoursMinutesSeconds;
       distance: number;
     }) => {
+      if (input.distance <= 0) return;
+      if (
+        input.pace.minutes < 0 ||
+        input.pace.seconds < 0 ||
+        input.pace.seconds >= 60
+      )
+        return;
+      if (
+        input.time.hours < 0 ||
+        input.time.minutes < 0 ||
+        input.time.seconds < 0 ||
+        input.time.minutes >= 60 ||
+        input.time.seconds >= 60
+      )
+        return;
+
       switch (lockedSetting) {
         case "pace": {
           const seconds = convertTimeToSeconds(input.time);
@@ -77,10 +96,20 @@ export const PaceCalculatorPage: React.FC = () => {
           });
           break;
         }
-        case "time":
+        case "time": {
+          const paceInSeconds = input.pace.minutes * 60 + input.pace.seconds;
+          const timeInSeconds = paceInSeconds * input.distance;
+          setTime(convertSecondsToTime(timeInSeconds));
           break;
-        case "distance":
+        }
+        case "distance": {
+          const paceInSeconds = input.pace.minutes * 60 + input.pace.seconds;
+          const seconds = convertTimeToSeconds(input.time);
+          if (paceInSeconds > 0) {
+            setDistance(Number((seconds / paceInSeconds).toFixed(1)));
+          }
           break;
+        }
       }
     },
     [lockedSetting]
