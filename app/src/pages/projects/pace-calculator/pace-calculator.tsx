@@ -24,13 +24,25 @@ const SettingSelectorButton: React.FC<React.ComponentProps<"button">> = ({
           : "bg-zinc-800 hover:outline-zinc-400 hover:bg-zinc-900",
         "px-3 py-2 hover:outline-2 outline-2 outline-zinc-800",
         "rounded-lg",
+        "flex flex-row gap-2",
         "transition-all duration-200"
       )}
     >
-      <button {...props} disabled={disabled}>
-        O
-      </button>
-      {children}
+      {!disabled && (
+        <div>
+          <button
+            className={clsx(
+              "py-1 px-2 border border-transparent rounded-md transition-all",
+              "hover:border-amber-600 focus-visible:border-amber-600",
+              "focus-visible:outline-none"
+            )}
+            {...props}
+          >
+            🔒
+          </button>
+        </div>
+      )}
+      <div>{children}</div>
     </div>
   );
 };
