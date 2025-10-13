@@ -16,19 +16,20 @@ const SettingSelectorButton: React.FC<React.ComponentProps<"button">> = ({
   disabled,
   ...props
 }) => {
-  // TODO: Do focus and similar classes as well
   return (
     <div
       className={clsx(
         disabled
           ? "bg-zinc-500/10 !cursor-default outline-2 !outline-amber-500"
           : "bg-zinc-800 hover:outline-zinc-400 hover:bg-zinc-900",
-          "px-3 py-2 hover:outline-2 outline-2 outline-zinc-800",
-          "rounded-lg",
-          "transition-all duration-200"
+        "px-3 py-2 hover:outline-2 outline-2 outline-zinc-800",
+        "rounded-lg",
+        "transition-all duration-200"
       )}
     >
-      <button {...props} disabled={disabled}>O</button>
+      <button {...props} disabled={disabled}>
+        O
+      </button>
       {children}
     </div>
   );
@@ -48,53 +49,57 @@ export const PaceCalculatorPage: React.FC = () => {
 
   const [lockedSetting, setLockedSetting] = React.useState<Setting>("pace");
 
-  const handleConversion = React.useCallback(() => {
-    switch (lockedSetting) {
-      case "pace": {
-        const seconds = convertTimeToSeconds(time);
-        const secondsPerKm = seconds / distance;
-        console.log({ time, seconds, secondsPerKm });
-        setPace(() => ({
-          minutes: Math.floor(secondsPerKm / 60),
-          seconds: secondsPerKm % 60,
-        }));
-        break;
+  const handleConversion = React.useCallback(
+    (input: {
+      pace: MinutesSeconds;
+      time: HoursMinutesSeconds;
+      distance: number;
+    }) => {
+      switch (lockedSetting) {
+        case "pace": {
+          const seconds = convertTimeToSeconds(input.time);
+          const secondsPerKm = seconds / input.distance;
+          setPace({
+            minutes: Math.floor(secondsPerKm / 60),
+            seconds: secondsPerKm % 60,
+          });
+          break;
+        }
+        case "time":
+          break;
+        case "distance":
+          break;
       }
-      case "time":
-        break;
-      case "distance":
-        break;
-    }
-  }, [distance, lockedSetting, time]);
+    },
+    [lockedSetting]
+  );
 
   const handlePaceChange = React.useCallback(
-    (pace: MinutesSeconds) => {
-      setPace(pace);
-      handleConversion();
+    (newPace: MinutesSeconds) => {
+      setPace(newPace);
+      handleConversion({ pace: newPace, time, distance });
     },
-    [handleConversion]
+    [distance, handleConversion, time]
   );
 
   const handleTimeChange = React.useCallback(
-    (time: HoursMinutesSeconds) => {
-      setTime(time);
-      handleConversion();
+    (newTime: HoursMinutesSeconds) => {
+      setTime(newTime);
+      handleConversion({ pace, time: newTime, distance });
     },
-    [handleConversion]
+    [distance, handleConversion, pace]
   );
 
   const handleDistanceChange = React.useCallback(
-    (distance: number) => {
-      setDistance(distance);
-      handleConversion();
+    (newDistance: number) => {
+      setDistance(newDistance);
+      handleConversion({ pace, time, distance: newDistance });
     },
-    [handleConversion]
+    [handleConversion, pace, time]
   );
 
   const makeLockedSettingChangeHandler = React.useCallback(
-    (setting: Setting) => () => {
-      setLockedSetting(setting);
-    },
+    (setting: Setting) => () => setLockedSetting(setting),
     []
   );
 
@@ -108,14 +113,24 @@ export const PaceCalculatorPage: React.FC = () => {
           onClick={makeLockedSettingChangeHandler("pace")}
         >
           <span className="text-xl">Pace</span>
-          <TimeInput type="mm:ss" value={pace} onChange={handlePaceChange} disabled={lockedSetting === "pace"} />
+          <TimeInput
+            type="mm:ss"
+            value={pace}
+            onChange={handlePaceChange}
+            disabled={lockedSetting === "pace"}
+          />
         </SettingSelectorButton>
         <SettingSelectorButton
           disabled={lockedSetting === "time"}
           onClick={makeLockedSettingChangeHandler("time")}
         >
           <span className="text-xl">Time</span>
-          <TimeInput type="hh:mm:ss" value={time} onChange={handleTimeChange} disabled={lockedSetting === "time"} />
+          <TimeInput
+            type="hh:mm:ss"
+            value={time}
+            onChange={handleTimeChange}
+            disabled={lockedSetting === "time"}
+          />
         </SettingSelectorButton>
         <SettingSelectorButton
           disabled={lockedSetting === "distance"}

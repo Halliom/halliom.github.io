@@ -52,7 +52,6 @@ const parseStringToValue = <T extends HoursMinutesSeconds | MinutesSeconds>(
   input: string
 ): T | null => {
   const parts = divideUnmaskedInputIntoParts(type, input);
-  console.log("parts", parts);
   if (parts === null) return null;
 
   if (type === "hh:mm:ss" && parts.length === 3) {
