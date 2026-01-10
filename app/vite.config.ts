@@ -10,7 +10,7 @@ export default defineConfig({
     react(),
     tailwindcss(),
     webfontDownload(
-      "https://fonts.googleapis.com/css2?family=Domine:wght@400..700&display=swap"
+      "https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Roboto+Serif:ital,opsz,wght@0,8..144,100..900;1,8..144,100..900&display=swap"
     ),
   ],
 });
