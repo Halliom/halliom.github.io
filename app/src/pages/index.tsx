@@ -12,9 +12,9 @@ export const IndexPage: React.FC = () => {
       <p className="text-center">
         I'm a software engineer with a passion for trying and learning new
         things. I usually do full-stack development, but I'm also interested in
-        other areas such as AI and mobile development and game engines. Most of
-        my recent projects are in React, TypeScript and Python, but I've done a
-        lot of previous work in Java and even earlier work in C/C++.
+        other areas such as AI and mobile development. Most of my recent
+        projects are in React, TypeScript and Python, but I've done a lot of
+        previous work in Java and even earlier work in C/C++.
       </p>
 
       <p className="text-center">
